@@ -203,19 +203,7 @@ Logs are stored in the `logs/` directory:
    pm2-service-install
    ```
 
-### Environment Variables
 
-Key environment variables in `.env`:
-
-```env
-NODE_ENV=production
-PORT=8080
-DB_SERVER=192.168.10.104
-DB_NAME=MeterOCRDESCO
-DB_USER=rdpdc
-DB_PASSWORD=Oculin@123
-JWT_SECRET=your-secret-key
-```
 
 ## 🧪 Testing
 
