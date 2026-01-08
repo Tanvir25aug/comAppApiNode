@@ -160,14 +160,14 @@ const CMO = sequelize.define('CMO', {
     field: 'synced_at'
   },
 
-  // User Reference
+  // User Reference (references AdminSecurity.UserId)
   userId: {
     type: DataTypes.STRING(450),
     allowNull: false,
     field: 'user_id',
     references: {
-      model: 'AspNetUsers',
-      key: 'Id'
+      model: 'AdminSecurity',
+      key: 'UserId'
     }
   }
 }, {

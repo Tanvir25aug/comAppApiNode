@@ -44,17 +44,19 @@ const validateRegister = [
   validate
 ];
 
-// Login validation rules
+// Login validation rules (accepts username or email)
 const validateLogin = [
-  body('email')
-    .trim()
-    .isEmail()
-    .withMessage('Please provide a valid email')
-    .normalizeEmail(),
-
   body('password')
     .notEmpty()
     .withMessage('Password is required'),
+
+  // Custom validation to ensure at least username or email is provided
+  body().custom((value, { req }) => {
+    if (!req.body.username && !req.body.email) {
+      throw new Error('Username or email is required');
+    }
+    return true;
+  }),
 
   validate
 ];

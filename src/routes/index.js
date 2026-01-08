@@ -4,6 +4,7 @@ const router = express.Router();
 // Import route modules
 const authRoutes = require('./auth');
 const cmoRoutes = require('./cmo');
+const customerRoutes = require('./customer');
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -18,5 +19,7 @@ router.get('/health', (req, res) => {
 // API routes
 router.use('/auth', authRoutes);
 router.use('/cmo', cmoRoutes);
+router.use('/customer', customerRoutes);
+router.use('/customers', customerRoutes);
 
 module.exports = router;

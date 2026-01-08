@@ -1,4 +1,4 @@
-const { CMO, User } = require('../models');
+const { CMO, AdminSecurity } = require('../models');
 const { Op } = require('sequelize');
 
 class CMOService {
@@ -38,9 +38,9 @@ class CMOService {
       offset,
       order: [[sortBy, sortOrder]],
       include: [{
-        model: User,
+        model: AdminSecurity,
         as: 'user',
-        attributes: ['id', 'username', 'fullName', 'email']
+        attributes: ['SecurityId', 'UserId', 'UserName']
       }]
     });
 
@@ -60,9 +60,9 @@ class CMOService {
     const cmo = await CMO.findOne({
       where: { id, userId },
       include: [{
-        model: User,
+        model: AdminSecurity,
         as: 'user',
-        attributes: ['id', 'username', 'fullName', 'email']
+        attributes: ['SecurityId', 'UserId', 'UserName']
       }]
     });
 

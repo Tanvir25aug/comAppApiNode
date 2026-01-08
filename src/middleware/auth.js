@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('../config/auth');
-const { User } = require('../models');
+const { AdminSecurity } = require('../models');
 const { errorResponse } = require('../utils/response');
 
 const auth = async (req, res, next) => {
@@ -15,16 +15,17 @@ const auth = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, jwtSecret);
 
-    // Find user
-    const user = await User.findByPk(decoded.id);
+    // Find user by SecurityId (primary key)
+    const user = await AdminSecurity.findByPk(decoded.id);
 
-    if (!user || !user.isActive) {
-      return errorResponse(res, 'Invalid token or user not active', 401);
+    if (!user) {
+      return errorResponse(res, 'Invalid token or user not found', 401);
     }
 
     // Attach user to request
     req.user = user;
-    req.userId = user.id;
+    req.userId = user.UserId; // Use UserId field for CMO relations
+    req.securityId = user.SecurityId; // SecurityId (primary key)
 
     next();
   } catch (error) {
@@ -45,10 +46,11 @@ const optionalAuth = async (req, res, next) => {
 
     if (token) {
       const decoded = jwt.verify(token, jwtSecret);
-      const user = await User.findByPk(decoded.id);
-      if (user && user.isActive) {
+      const user = await AdminSecurity.findByPk(decoded.id);
+      if (user) {
         req.user = user;
-        req.userId = user.id;
+        req.userId = user.UserId;
+        req.securityId = user.SecurityId;
       }
     }
 

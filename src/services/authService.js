@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
-const { User } = require('../models');
+const { AdminSecurity } = require('../models');
 const { jwtSecret, jwtExpire, jwtRefreshExpire } = require('../config/auth');
 
 class AuthService {
@@ -10,26 +10,20 @@ class AuthService {
     return jwt.sign(
       {
         id: userJson.id,
-        email: userJson.email,
-        roleId: userJson.roleId
+        userId: userJson.userId,
+        username: userJson.username
       },
       jwtSecret,
       { expiresIn }
     );
   }
 
-  // Login user with ASP.NET Identity
-  async login(email, password) {
-    // Find user by username (case-insensitive search using NormalizedUserName)
-    const normalizedUserName = email.toUpperCase();
-    const user = await User.findOne({
+  // Login user with AdminSecurity table (plain text password)
+  async login(username, password) {
+    // Find user by username
+    const user = await AdminSecurity.findOne({
       where: {
-        [Op.or]: [
-          { UserName: email },
-          { NormalizedUserName: normalizedUserName },
-          { Email: email },
-          { NormalizedEmail: normalizedUserName }
-        ]
+        UserName: username
       }
     });
 
@@ -37,20 +31,12 @@ class AuthService {
       throw new Error('Invalid credentials');
     }
 
-    // Check if account is activated
-    if (!user.Activated) {
-      throw new Error('Account is deactivated');
-    }
-
-    // Check password using ASP.NET Identity password hasher
-    const isMatch = await user.comparePassword(password);
+    // Check password using plain text comparison
+    const isMatch = user.comparePassword(password);
 
     if (!isMatch) {
       throw new Error('Invalid credentials');
     }
-
-    // Update last login time
-    await user.update({ LastLoginTime: new Date() });
 
     // Generate tokens
     const accessToken = this.generateToken(user);
@@ -67,9 +53,9 @@ class AuthService {
   async refreshToken(refreshToken) {
     try {
       const decoded = jwt.verify(refreshToken, jwtSecret);
-      const user = await User.findByPk(decoded.id);
+      const user = await AdminSecurity.findByPk(decoded.id);
 
-      if (!user || !user.Activated) {
+      if (!user) {
         throw new Error('Invalid refresh token');
       }
 
@@ -85,7 +71,7 @@ class AuthService {
 
   // Get user profile
   async getProfile(userId) {
-    const user = await User.findByPk(userId);
+    const user = await AdminSecurity.findByPk(userId);
 
     if (!user) {
       throw new Error('User not found');
@@ -96,14 +82,14 @@ class AuthService {
 
   // Update user profile (limited fields only)
   async updateProfile(userId, updates) {
-    const user = await User.findByPk(userId);
+    const user = await AdminSecurity.findByPk(userId);
 
     if (!user) {
       throw new Error('User not found');
     }
 
-    // Only allow updating these fields
-    const allowedFields = ['FirstName', 'LastName', 'PhoneNumber', 'ProfilePicUrl'];
+    // Only allow updating UserName field
+    const allowedFields = ['UserName'];
     const filteredUpdates = {};
 
     Object.keys(updates).forEach(key => {

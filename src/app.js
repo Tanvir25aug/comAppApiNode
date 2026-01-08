@@ -59,6 +59,8 @@ app.get('/', (req, res) => {
       health: `${apiPrefix}/health`,
       auth: `${apiPrefix}/auth`,
       cmo: `${apiPrefix}/cmo`,
+      customer: `${apiPrefix}/customer`,
+      customers: `${apiPrefix}/customers`,
       documentation: '/api-docs'
     }
   });

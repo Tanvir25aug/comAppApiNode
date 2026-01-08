@@ -1,15 +1,18 @@
 const { sequelize } = require('../config/database');
 const User = require('./User');
+const AdminSecurity = require('./AdminSecurity');
 const CMO = require('./CMO');
 
-// Define associations
-User.hasMany(CMO, {
+// Define associations with AdminSecurity (primary authentication table)
+AdminSecurity.hasMany(CMO, {
   foreignKey: 'userId',
+  sourceKey: 'UserId',
   as: 'cmos'
 });
 
-CMO.belongsTo(User, {
+CMO.belongsTo(AdminSecurity, {
   foreignKey: 'userId',
+  targetKey: 'UserId',
   as: 'user'
 });
 
@@ -31,6 +34,7 @@ const syncDatabase = async (force = false) => {
 module.exports = {
   sequelize,
   User,
+  AdminSecurity,
   CMO,
   syncDatabase
 };

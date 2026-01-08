@@ -3,12 +3,14 @@ const { successResponse, errorResponse } = require('../utils/response');
 const logger = require('../utils/logger');
 
 class AuthController {
-  // Login with existing ASP.NET Identity user
+  // Login with AdminSecurity table
   async login(req, res) {
     try {
-      const { email, password } = req.body;
-      const result = await authService.login(email, password);
-      logger.info(`User logged in: ${email}`);
+      const { username, password, email } = req.body;
+      // Support both 'username' and 'email' fields for backward compatibility
+      const loginUsername = username || email;
+      const result = await authService.login(loginUsername, password);
+      logger.info(`User logged in: ${loginUsername}`);
       return successResponse(res, result, 'Login successful');
     } catch (error) {
       logger.error(`Login error: ${error.message}`);
